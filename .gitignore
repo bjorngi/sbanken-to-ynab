@@ -2,4 +2,4 @@ node_modules/
 dist/
 secrets/
 .env
-src/config.ts
+config.json

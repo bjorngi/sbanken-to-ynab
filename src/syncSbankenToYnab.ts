@@ -1,7 +1,10 @@
 import { filter, from, map, mergeMap } from "rxjs";
 import * as sbanken from "./sbanken";
 import * as ynab from "./ynab";
-import { accountLink } from "./config";
+import { getEnviromentVariable } from "./utils";
+
+const configPath = getEnviromentVariable('ACCOUNT_CONFIG_PATH');
+const accountLink: { [key: string]: string} = require(configPath);
 
 from(Object.entries(accountLink)).pipe(
   mergeMap(([ bankAccount, ynabAccount ]) => {
