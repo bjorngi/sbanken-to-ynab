@@ -1,11 +1,11 @@
 import { filter, from, map, mergeMap } from "rxjs";
 import * as sbanken from "./sbanken";
 import * as ynab from "./ynab";
-import fs  from 'fs';
+import fs  from "fs";
 import { getEnviromentVariable } from "./utils";
 
 const configPath = getEnviromentVariable("ACCOUNT_CONFIG_PATH");
-const accountLink: { [key: string]: string} = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+const accountLink: { [key: string]: string} = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
 from(Object.entries(accountLink)).pipe(
   mergeMap(([ bankAccount, ynabAccount ]) => {
