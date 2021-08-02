@@ -68,5 +68,15 @@ export interface ISbankenTransacion   {
       transactionId: string
     },
     transactionDetailSpecified: boolean;
+    transactionDetail?: {
+        formattedAccountNumber: string;
+        transactionId: number;
+        cid: number;
+        amountDescription: string; 
+        receiverName: string;
+        numericReference: number;
+        payerName: string;
+        registrationDate: string;
+      }
   }
 
