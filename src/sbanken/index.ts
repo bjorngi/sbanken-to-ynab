@@ -3,20 +3,20 @@ import * as sbankenApi from "./api";
 import { find, identity, map, mergeMap, Observable, toArray } from "rxjs";
 import { ICommonTransaction } from "../types";
 import { ISbankenTransacion } from "./api/types";
-import customParseFormat from "dayjs/plugin/customParseFormat"
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import dayjs from "dayjs";
-dayjs.extend(customParseFormat)
+dayjs.extend(customParseFormat);
 
-const getDateFromText = (memo: ISbankenTransacion['text']) => {
-  const whereDateShouldBe = memo.slice(6,11)
-  const parsedDate = dayjs(whereDateShouldBe, 'DD.MM', true)
-  return parsedDate
-}
+const getDateFromText = (memo: ISbankenTransacion["text"]) => {
+  const whereDateShouldBe = memo.slice(6,11);
+  const parsedDate = dayjs(whereDateShouldBe, "DD.MM", true);
+  return parsedDate;
+};
 
 const getBestDate = (transaction: ISbankenTransacion) => {
-  const dateFromText = getDateFromText(transaction.text)
+  const dateFromText = getDateFromText(transaction.text);
   if(dateFromText.isValid()) {
-    return dateFromText
+    return dateFromText;
   } else if(transaction.cardDetailsSpecified) {
     return dayjs(transaction.cardDetails.purchaseDate);
   } else if(transaction.transactionDetailSpecified) {
