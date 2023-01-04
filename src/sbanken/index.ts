@@ -15,17 +15,12 @@ const getDateFromText = (memo: ISbankenTransacion["text"]) => {
 
 const getBestDate = (transaction: ISbankenTransacion) => {
   const dateFromText = getDateFromText(transaction.text);
-  if(dateFromText.isValid()) {
+  if(dateFromText.isValid() && dateFromText.isBefore(dayjs())) {
     return dateFromText;
-  } else if(transaction.cardDetailsSpecified) {
+  } else if(transaction.cardDetailsSpecified && dayjs(transaction.cardDetails.purchaseDate).isBefore(dayjs())) {
     return dayjs(transaction.cardDetails.purchaseDate);
   } else if(transaction.transactionDetailSpecified) {
     return dayjs(transaction.transactionDetail.registrationDate);
-  } else if(
-    !!transaction.interestDate &&
-    !dayjs(transaction.interestDate).isAfter(dayjs(transaction.accountingDate))
-  ) {
-    return dayjs(transaction.interestDate);
   } else {
     return dayjs(transaction.accountingDate);
   }
