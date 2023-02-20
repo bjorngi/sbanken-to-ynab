@@ -15,7 +15,7 @@ from(Object.entries(accountLink)).pipe(
       map((response) => `Sync for bank account ${bankAccount} and YNAB account ${ynabAccount}
 New: ${response.transaction_ids.length}
 Duplicates: ${response.duplicate_import_ids.length}
-`
+      `
       )
     );
   })

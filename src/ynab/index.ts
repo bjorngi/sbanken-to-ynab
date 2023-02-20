@@ -1,7 +1,8 @@
 import * as ynabApi from "./api/index";
 import dotenv from "dotenv";
 import { getEnviromentVariable } from "../utils";
-import { filter, identity, map, mergeMap, of, toArray } from "rxjs";
+import { filter, from, identity, map, toArray, mergeMap, zip } from "rxjs";
+import { groupBy, mergeAll, scan } from "rxjs/operators";
 import { IYNABTransaction } from "./api/types";
 import { ICommonTransaction } from "../types";
 import dayjs from "dayjs";
@@ -27,7 +28,7 @@ export const getTransactionsFromAccount = (ynabAccountNumber: string) => (
   )
 );
 
-const parseCommonToYnabTransactions = (ynabAccountNumber: string) => (transaction: ICommonTransaction): IYNABTransaction => {
+const parseCommonToYnabTransactions = (ynabAccountNumber: string, importId = 1) => (transaction: ICommonTransaction): IYNABTransaction => {
   const parsedAmount = Math.round(transaction.amount * 1000);
   const formatedDate = transaction.date.format("YYYY-MM-DD");
 
@@ -39,18 +40,30 @@ const parseCommonToYnabTransactions = (ynabAccountNumber: string) => (transactio
     flag_color: "blue",
     account_id: ynabAccountNumber,
     cleared: "cleared",
-    import_id: `YNAB:${parsedAmount}:${formatedDate}:1`
+    import_id: `YNAB:${parsedAmount}:${formatedDate}:${importId}`
   };
 };
 
-export const addTransactions = (ynabAccountNumber: string, transactions: ICommonTransaction[]) => (
-  of(transactions).pipe(
-    mergeMap(identity),
-    map(parseCommonToYnabTransactions(ynabAccountNumber)),
+type ScanType = [number[], number, ICommonTransaction]
+const findDuplicates = (acc: ScanType, cur: ICommonTransaction): ScanType => {
+  const [prevAmounts] = acc;
+  const newAmounts = [...prevAmounts as number[], cur.amount];
+  const countAmount = newAmounts.filter((a) => a === cur.amount).length;
+  return [newAmounts, countAmount, cur];
+};
+
+export const addTransactions = (ynabAccountNumber: string, transactions: ICommonTransaction[]) => {
+  return zip(from(transactions).pipe(
+    groupBy((transaction) => transaction.date.format("YYYY-MM-DD")),
+    mergeMap((group$) => group$.pipe(
+      scan(findDuplicates, [[], 1, null]),
+      map(([amounts, importId, transaction]) => parseCommonToYnabTransactions(ynabAccountNumber, importId)(transaction)),
+    )))).pipe(
+    mergeAll(),
     toArray(),
     map((transactions) => ({
       transactions: transactions,
     })),
     mergeMap(ynabApi.addTransactions(accessToken, budgetId))
-  )
-);
+  );
+};

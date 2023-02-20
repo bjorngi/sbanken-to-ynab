@@ -46,4 +46,3 @@ export const getTransactionsFromAccount = (accountNumber: string): Observable<IC
     toArray(),
   )
 );
-
