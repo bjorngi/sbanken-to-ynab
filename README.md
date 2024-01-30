@@ -1,3 +1,6 @@
+Sbanken stenger ned. Jeg flytter til Sparebank1, her er ekvivalenten til sbanken-to-ynab for sparebank1, https://github.com/bjorngi/sparebank1-to-ynab
+
+
 Automatisk synkroniser [Sbanken](https://sbanken.no/) med [You Need A Budget (YNAB)](https://www.youneedabudget.com/).
 
 Programmet er laget for å kjøres med CRON eller annen orkestering som kjører programmet gjenvlig.
